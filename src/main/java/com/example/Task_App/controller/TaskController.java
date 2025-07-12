@@ -16,7 +16,6 @@ public class TaskController {
 
     @PostMapping("/create-task")
     public ResponseEntity<String> createTask(@RequestBody Task task){
-        System.out.println("🔥 createTask() method called");
         return ResponseEntity.ok(taskService.createTask(task));
     }
 
@@ -25,12 +24,12 @@ public class TaskController {
         return ResponseEntity.ok(taskService.getTask(id));
     }
 
-    @PutMapping()
+    @PutMapping("/update-title")
     public ResponseEntity<String> updateTaskTitle(@RequestBody Task task){
         return ResponseEntity.ok(taskService.updateTaskTitle(task));
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/delete-task/{id}")
     public ResponseEntity<String> deleteTask(@PathVariable("id") String id){
         return ResponseEntity.ok(taskService.deleteTask(id));
     }
