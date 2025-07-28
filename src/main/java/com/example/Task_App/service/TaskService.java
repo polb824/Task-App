@@ -1,21 +1,30 @@
 package com.example.Task_App.service;
 
 import com.example.Task_App.dto.TaskDto;
-import com.example.Task_App.repository.TaskRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.example.Task_App.entity.TaskEntity;
+import com.example.Task_App.mapper.TaskMapper;
+
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.stream.Collectors;
+
 
 @Service
 public class TaskService {
 
-    @Autowired
-    private TaskRepository taskRepository;
+    private final TaskMapper taskMapper;
 
-//    public List<TaskDto> getAllTask(){
-//        return taskRepository.findAll().stream().map(this::convertToDto).collect(Collectors.toList());
-//    }
+    public TaskService(TaskMapper taskMapper){
+        this.taskMapper = taskMapper;
+    }
+
+    public TaskDto processTask (TaskDto dto){
+        TaskEntity entity = taskMapper.toEntity(dto);
+        return taskMapper.toDto(entity);
+    }
+
+    public List<TaskDto> getAllTask(){
+        return List.of();
+    }
 
 }

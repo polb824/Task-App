@@ -1,21 +1,16 @@
 package com.example.Task_App.entity;
 
-import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
 
-import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
-@Table(name = "task")
-@Getter
-@Setter
 public class TaskEntity {
+
     @Id
-    @GeneratedValue (strategy = GenerationType.AUTO)
-    private long id;
+    private Long id;
     private String title;
-    private String description;
-    private boolean isDone= false;
-    private LocalDateTime dueDate;
+    private List<String> tags;
+
 }

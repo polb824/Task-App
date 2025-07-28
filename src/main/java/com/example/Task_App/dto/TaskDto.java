@@ -1,13 +1,10 @@
 package com.example.Task_App.dto;
-import lombok.Data;
 
-import java.time.LocalDateTime;
-@Data
-public class TaskDto {
+import java.util.List;
 
-    private long id;
+public class TaskDto{
     private String title;
-    private String description;
-    private boolean isDone = false;
-    private LocalDateTime dueDate;
+    private List<String> tags;
+    private List<CheckListItemDto> checkListItem;
+
 }
