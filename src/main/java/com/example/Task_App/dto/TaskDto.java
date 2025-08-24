@@ -1,10 +1,12 @@
 package com.example.Task_App.dto;
 
+import lombok.Data;
 import java.util.List;
 
-public class TaskDto{
+@Data
+public class TaskDto {
+    private Long id;
     private String title;
     private List<String> tags;
     private List<CheckListItemDto> checkListItem;
-
 }

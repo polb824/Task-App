@@ -1,6 +1,10 @@
 package com.example.Task_App.dto;
 
+import lombok.Data;
+
+@Data
 public class CheckListItemDto {
-    public String description;
-    public boolean isDone;
+    private Long id;
+    private String description;
+    private boolean done;
 }

@@ -12,19 +12,36 @@ import java.util.List;
 @Service
 public class TaskService {
 
+    private final TaskRepository taskRepository
     private final TaskMapper taskMapper;
 
-    public TaskService(TaskMapper taskMapper){
+    public TaskService(TaskMapper taskMapper, TaskRepository taskRepository){
         this.taskMapper = taskMapper;
+        this.taskRepository = taskRepository;
     }
 
-    public TaskDto processTask (TaskDto dto){
+    public TaskDto saveTask (TaskDto dto){
         TaskEntity entity = taskMapper.toEntity(dto);
-        return taskMapper.toDto(entity);
+        TaskEntity saved = taskRepository.save(entity);
+        return taskMapper.toDto(saved);
     }
 
-    public List<TaskDto> getAllTask(){
-        return List.of();
+    //get all
+    public List <TaskDto> getAllTask (){
+        return taskRepository.findAll()
+        .stream()
+        .map (taskMapper::toDto)
+        .collect(Collectors.toList());
+    }
+
+    public List<TaskDto> getTaskById(Long id){
+        return taskRepository.findById(id)
+               .map (taskMapper::toDto)
+               .orElse(null);
+    }
+
+    public void deleteTask (Long id){
+        taskRepository.deleteById(id);
     }
 
 }
