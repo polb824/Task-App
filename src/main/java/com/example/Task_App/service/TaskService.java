@@ -1,49 +1,61 @@
 package com.example.Task_App.service;
 
-import com.example.Task_App.dto.TaskDto;
-import com.example.Task_App.entity.TaskEntity;
-import com.example.Task_App.mapper.TaskMapper;
-
-import com.example.Task_App.repository.TaskRepository;
+import com.example.Task_App.dao.Task;
+import com.google.api.core.ApiFuture;
+import com.google.cloud.firestore.*;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
-import java.util.stream.Collectors;
-
+import java.util.concurrent.ExecutionException;
 
 @Service
+@Slf4j
 public class TaskService {
 
-    private final TaskRepository taskRepository;
-    private final TaskMapper taskMapper;
+    private final Firestore firestore;
 
-    public TaskService(TaskMapper taskMapper, TaskRepository taskRepository){
-        this.taskMapper = taskMapper;
-        this.taskRepository = taskRepository;
+    public TaskService(Firestore firestore) {
+        this.firestore = firestore;
     }
 
-    public TaskDto saveTask (TaskDto dto){
-        TaskEntity entity = taskMapper.toEntity(dto);
-        TaskEntity saved = taskRepository.save(entity);
-        return taskMapper.toDto(saved);
+    public Task getTask(String id) {
+        try {
+            ApiFuture<DocumentSnapshot> tasks = firestore.collection("tasks").document(id).get();
+            return tasks.get().toObject(Task.class);
+        } catch (InterruptedException | ExecutionException e) {
+            log.error(e.getMessage());
+            throw new RuntimeException(e);
+        }
     }
 
-    //get all
-    public List <TaskDto> getAllTask (){
-        return taskRepository.findAll()
-        .stream()
-        .map (taskMapper::toDto)
-        .collect(Collectors.toList());
+    public String createTask(Task task) {
+        try {
+            ApiFuture<DocumentReference> tasks = firestore.collection("tasks").add(task);
+            return "Document saved: id is " + tasks.get().getId();
+        } catch (InterruptedException | ExecutionException e) {
+            log.error(e.getMessage());
+            throw new RuntimeException(e);
+        }
     }
 
-    public TaskDto getTaskById(Long id) {
-        return taskRepository.findById(id)
-                .map(taskMapper::toDto)
-                .orElse(null);
+    public String updateTaskTitle(Task task) {
+        try {
+            ApiFuture<WriteResult> tasks = firestore.collection("tasks")
+                    .document(String.valueOf(task.getId()))
+                    .update("title", task.getTitle());
+
+            return "Title updated at: " + tasks.get().getUpdateTime();
+        } catch (InterruptedException | ExecutionException e) {
+            throw new RuntimeException(e);
+        }
     }
 
-    public void deleteTask (Long id){
-        taskRepository.deleteById(id);
+    public String deleteTask(String id) {
+        try {
+            ApiFuture<WriteResult> tasks = firestore.collection("tasks").document(id).delete();
+            return "Task deleted at : " + tasks.get().getUpdateTime();
+        } catch (InterruptedException | ExecutionException e) {
+            throw new RuntimeException(e);
+        }
     }
 
 }

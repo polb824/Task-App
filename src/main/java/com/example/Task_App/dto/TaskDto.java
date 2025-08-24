@@ -1,12 +1,17 @@
 package com.example.Task_App.dto;
 
-import lombok.Data;
+import com.example.Task_App.dao.Task;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
 import java.util.List;
 
-@Data
+@Getter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class TaskDto {
-    private Long id;
-    private String title;
-    private List<String> tags;
-    private List<CheckListItemDto> checkListItem;
+    private List<Task> tasks;
 }
