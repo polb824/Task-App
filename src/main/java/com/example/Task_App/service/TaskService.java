@@ -4,15 +4,17 @@ import com.example.Task_App.dto.TaskDto;
 import com.example.Task_App.entity.TaskEntity;
 import com.example.Task_App.mapper.TaskMapper;
 
+import com.example.Task_App.repository.TaskRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 @Service
 public class TaskService {
 
-    private final TaskRepository taskRepository
+    private final TaskRepository taskRepository;
     private final TaskMapper taskMapper;
 
     public TaskService(TaskMapper taskMapper, TaskRepository taskRepository){
@@ -34,10 +36,10 @@ public class TaskService {
         .collect(Collectors.toList());
     }
 
-    public List<TaskDto> getTaskById(Long id){
+    public TaskDto getTaskById(Long id) {
         return taskRepository.findById(id)
-               .map (taskMapper::toDto)
-               .orElse(null);
+                .map(taskMapper::toDto)
+                .orElse(null);
     }
 
     public void deleteTask (Long id){
