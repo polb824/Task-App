@@ -8,7 +8,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 @Service
@@ -58,15 +60,18 @@ public class TaskService {
         }
     }
 
-    public String updateTaskTitle(Task task) {
+    public String updateTask(String id, Task updatedTask) {
         try {
-            ApiFuture<WriteResult> tasks = firestore.collection("tasks")
-                    .document(String.valueOf(task.getId()))
-                    .update("title", task.getTitle());
+            DocumentReference taskDoc = firestore.collection("tasks").document(id);
+            Map<String, Object> updateTask = new HashMap<>();
+            updateTask.put("title", updatedTask.getTitle());
+            updateTask.put("description", updatedTask.getDescription());
 
-            return "Title updated at: " + tasks.get().getUpdateTime();
+            ApiFuture<WriteResult> writeResult = taskDoc.update(updateTask);
+            return "Task updated at: " + writeResult.get().getUpdateTime();
         } catch (InterruptedException | ExecutionException e) {
-            throw new RuntimeException(e);
+            log.error("Error updating task", e);
+            throw new RuntimeException("Failed to update task", e);
         }
     }
 

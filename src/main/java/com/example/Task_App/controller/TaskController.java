@@ -2,6 +2,7 @@ package com.example.Task_App.controller;
 import com.example.Task_App.dao.Task;
 import com.example.Task_App.service.TaskService;
 import org.apache.coyote.Response;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -31,9 +32,16 @@ public class TaskController {
         return ResponseEntity.ok(taskService.getTask(id));
     }
 
-    @PutMapping("/update-title")
-    public ResponseEntity<String> updateTaskTitle(@RequestBody Task task){
-        return ResponseEntity.ok(taskService.updateTaskTitle(task));
+    @PutMapping("/update-task/{id}")
+    public ResponseEntity<String> updateTask(@PathVariable String id, @RequestBody Task updatedTask) {
+        try {
+            String result = taskService.updateTask(id, updatedTask);
+            return ResponseEntity.ok(result);
+        } catch (Exception e) {
+            return ResponseEntity
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Failed to update task");
+        }
     }
 
     @DeleteMapping("/delete-task/{id}")
