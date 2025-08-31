@@ -11,4 +11,5 @@ public class Task {
     private String description;
     private boolean isDone = false;
     private String dueDate;
+    private String color;
 }

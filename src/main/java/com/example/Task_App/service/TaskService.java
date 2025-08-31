@@ -66,6 +66,7 @@ public class TaskService {
             Map<String, Object> updateTask = new HashMap<>();
             updateTask.put("title", updatedTask.getTitle());
             updateTask.put("description", updatedTask.getDescription());
+            updateTask.put("color", updatedTask.getColor());
 
             ApiFuture<WriteResult> writeResult = taskDoc.update(updateTask);
             return "Task updated at: " + writeResult.get().getUpdateTime();
