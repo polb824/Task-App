@@ -3,7 +3,6 @@ package com.example.Task_App.service;
 import com.example.Task_App.dao.Task;
 import com.google.api.core.ApiFuture;
 import com.google.cloud.firestore.*;
-import com.google.protobuf.Api;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -62,13 +61,17 @@ public class TaskService {
 
     public String updateTask(String id, Task updatedTask) {
         try {
-            DocumentReference taskDoc = firestore.collection("tasks").document(id);
-            Map<String, Object> updateTask = new HashMap<>();
-            updateTask.put("title", updatedTask.getTitle());
-            updateTask.put("description", updatedTask.getDescription());
-            updateTask.put("color", updatedTask.getColor());
+            Map<String, Object> updateData = buildUpdateData(updatedTask);
+            log.info("Updating task {} with data: {}", id, updateData);
 
-            ApiFuture<WriteResult> writeResult = taskDoc.update(updateTask);
+            if (updateData.isEmpty()) {
+                throw new RuntimeException("No valid fields to update");
+            }
+
+            ApiFuture<WriteResult> writeResult = firestore.collection("tasks")
+                    .document(id)
+                    .update(updateData);
+
             return "Task updated at: " + writeResult.get().getUpdateTime();
         } catch (InterruptedException | ExecutionException e) {
             log.error("Error updating task", e);
@@ -85,4 +88,53 @@ public class TaskService {
         }
     }
 
+    public List<Task> getImportantTasks() {
+        List<Task> taskList = new ArrayList<>();
+        try {
+            ApiFuture<QuerySnapshot> future = firestore.collection("tasks")
+                    .whereEqualTo("isImportant", true)
+                    .get();
+            List<QueryDocumentSnapshot> documents = future.get().getDocuments();
+            for (QueryDocumentSnapshot doc : documents) {
+                Task task = doc.toObject(Task.class);
+                task.setId(doc.getId());
+                taskList.add(task);
+            }
+        } catch (InterruptedException | ExecutionException e) {
+            log.error(e.getMessage());
+            throw new RuntimeException(e);
+        }
+        return taskList;
+    }
+
+    private Map<String, Object> buildUpdateData(Task updatedTask) {
+        Map<String, Object> updateData = new HashMap<>();
+
+        addIfNotEmpty(updateData, "title", updatedTask.getTitle());
+        addIfNotEmpty(updateData, "description", updatedTask.getDescription());
+        addIfNotNull(updateData, "color", updatedTask.getColor());
+        addIfNotNull(updateData, "dueDate", updatedTask.getDueDate());
+
+        if (updatedTask.getIsDone() != null) {
+            updateData.put("isDone", updatedTask.getIsDone());
+        }
+        if (updatedTask.getIsImportant() != null) {
+            updateData.put("isImportant", updatedTask.getIsImportant());
+        }
+
+        log.info("Built update data: {}", updateData);
+        return updateData;
+    }
+
+    private void addIfNotEmpty(Map<String, Object> map, String key, String value) {
+        if (value != null && !value.trim().isEmpty()) {
+            map.put(key, value.trim());
+        }
+    }
+
+    private void addIfNotNull(Map<String, Object> map, String key, Object value) {
+        if (value != null) {
+            map.put(key, value);
+        }
+    }
 }

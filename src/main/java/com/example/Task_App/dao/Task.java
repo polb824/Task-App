@@ -9,7 +9,8 @@ public class Task {
     private String id;
     private String title;
     private String description;
-    private boolean isDone = false;
+    private Boolean isDone = false;
     private String dueDate;
     private String color;
+    private Boolean isImportant = false;
 }
